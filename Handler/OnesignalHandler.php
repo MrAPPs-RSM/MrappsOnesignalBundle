@@ -4,7 +4,7 @@ namespace Mrapps\OnesignalBundle\Handler;
 
 use Symfony\Component\DependencyInjection\Container;
 use Doctrine\ORM\EntityManager;
-
+use Mrapps\OnesignalBundle\Model\UserInterface;
 
 class OnesignalHandler
 {
@@ -115,6 +115,15 @@ class OnesignalHandler
         }
 
         return null;
+    }
+
+    public function deactivateAllPlayersForUser(UserInterface $user = null) {
+
+        if($user !== null) {
+            return $this->em->getRepository('MrappsOnesignalBundle:UserPlayer')->unsetUserPlayers($user);
+        }
+
+        return false;
     }
 
 

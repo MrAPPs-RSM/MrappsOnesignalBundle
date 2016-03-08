@@ -1,3 +1,4 @@
-mrapps_onesignal_homepage:
-    path:     /
-    defaults: { _controller: MrappsOnesignalBundle:Default:index }
+mrapps_onesignal:
+    resource: "@MrappsOnesignalBundle/Controller/"
+    type:     annotation
+    prefix:   /

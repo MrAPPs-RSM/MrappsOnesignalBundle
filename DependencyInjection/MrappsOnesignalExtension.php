@@ -22,6 +22,10 @@ class MrappsOnesignalExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
+        $container->setParameter('mrapps_onesignal.parameters.app_id', $config['parameters']['app_id']);
+        $container->setParameter('mrapps_onesignal.parameters.rest_api_key', $config['parameters']['rest_api_key']);
+
+
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
     }

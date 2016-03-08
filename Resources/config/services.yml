@@ -1,0 +1,4 @@
+services:
+#    mrapps_onesignal.example:
+#        class: Mrapps\OnesignalBundle\Example
+#        arguments: [@service_id, "plain_value", %parameter%]

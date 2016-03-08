@@ -20,7 +20,7 @@ class OnesignalHandler
     private function getParameters() {
 
         $appId = ($this->container->hasParameter('mrapps_onesignal.parameters.app_id')) ? $this->container->getParameter('mrapps_onesignal.parameters.app_id') : '';
-        $restKey = ($this->container->hasParameter('mrapps_onesignal.parameters.rest_api_key')) ? $this->container->getParameter('mrapps_onesignal.parameters.rest_api_key') : '';
+        $restKey = ($this->container->hasParameter('mrapps_onesignal.web_push.rest_api_key')) ? $this->container->getParameter('mrapps_onesignal.web_push.rest_api_key') : '';
 
         return array(
             'app_id' => $appId,

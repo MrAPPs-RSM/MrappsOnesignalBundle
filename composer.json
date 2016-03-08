@@ -1,0 +1,37 @@
+{
+  "name": "mrapps/onesignalbundle",
+  "description": "Gestione notifiche OneSignal - Symfony2",
+  "type": "symfony-bundle",
+  "authors": [
+    {
+      "name": "Mr.APPs srl",
+      "email": "info@mr-apps.com"
+    }
+  ],
+  "keywords": [
+    "mrapps onesignal push notifications chrome safari google android apple ios symfony bundle"
+  ],
+  "license": [
+    "MIT"
+  ],
+  "require": {
+    "php": ">=5.4",
+    "symfony/symfony": ">=2.6",
+    "friendsofsymfony/user-bundle": "~1.3"
+  },
+  "autoload": {
+    "psr-0": {
+      "Mrapps\\OnesignalBundle": ""
+    }
+  },
+  "target-dir": "Mrapps/OnesignalBundle",
+  "repositories": [
+    {
+    }
+  ],
+  "extra": {
+    "branch-alias": {
+      "dev-master": "0.1-dev"
+    }
+  }
+}

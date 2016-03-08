@@ -12,6 +12,27 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
  */
 class OnesignalController extends Controller
 {
+    public function __jsAction($device_name = '', $device_version = '', $platform = '')
+    {
+        $container = $this->container;
+
+        $appId = $container->hasParameter('mrapps_onesignal.parameters.app_id') ? $container->getParameter('mrapps_onesignal.parameters.app_id') : '';
+        $appName = $container->hasParameter('mrapps_onesignal.parameters.app_name') ? $container->getParameter('mrapps_onesignal.parameters.app_name') : '';
+        $gcmSenderId = $container->hasParameter('mrapps_onesignal.web_push.gcm_sender_id') ? $container->getParameter('mrapps_onesignal.web_push.gcm_sender_id') : '';
+        $safariWebId = $container->hasParameter('mrapps_onesignal.web_push.safari_web_id') ? $container->getParameter('mrapps_onesignal.web_push.safari_web_id') : '';
+
+
+        return $this->render('MrappsOnesignalBundle:Onesignal:js.html.twig', array(
+            "app_id" => $appId,
+            "app_name" => $appName,
+            "gcm_sender_id" => $gcmSenderId,
+            "safari_web_id" => $safariWebId,
+            "device_name" => trim($device_name),
+            "device_version" => trim($device_version),
+            "platform" => trim($platform),
+        ));
+    }
+
     /**
      * @Route("/reg_player", name="mrapps_onesignal_regplayer")
      */

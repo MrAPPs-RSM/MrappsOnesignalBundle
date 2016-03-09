@@ -56,11 +56,16 @@ mrapps_onesignal:
 ## Utilizzo
 ```twig
 {#
-- Aggiungere questa riga nel punto in cui si vuole renderizzare il blocco javascript per attivare le notifiche OneSignal.
+
+- Aggiungere questa riga nel punto in cui si vuole renderizzare il blocco javascript per attivare le
+  notifiche OneSignal.
 
 - INCLUDERE JQUERY PRIMA DI QUESTA RIGA!!!
 
-- Se si vogliono passare i parametri device_name, device_version e platform (opzionali), creare una rotta in un proprio controller, leggere i dati in qualche modo (ad esempio parsando lo user agent) e forwardare il controller nel bundle MrappsOnesignal.
+- Se si vogliono passare i parametri device_name, device_version e platform (opzionali), creare una rotta
+  in un proprio controller, leggere i dati in qualche modo (ad esempio parsando lo user agent) e forwardare
+  il controller nel bundle MrappsOnesignal.
+  
 #}
 {{ render(controller('MrappsOnesignalBundle:Onesignal:__js', {'device_name':'[[ NOME BROWSER ]]', 'device_version':'[[ VERSIONE BROWSER ]]', 'platform':'[[ NOME SO ]]'})) }}
 ```

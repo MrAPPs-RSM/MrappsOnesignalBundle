@@ -78,7 +78,7 @@ Attivazione notifiche lato client:
 
 Servizio:
 ```php
-$os = $this->container->get('mrapps.onesignal');
+$os = $container->get('mrapps.onesignal');
 ```
 
 

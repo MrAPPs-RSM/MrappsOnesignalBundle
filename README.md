@@ -1,6 +1,11 @@
 # Mrapps OneSignal
 Gestione notifiche OneSignal - bundle per Symfony2
 
+## Requisiti
+
+  - PHP 5.4+
+  - Symfony2 2.6+
+
 ## Installazione
 
 composer.json:
@@ -20,106 +25,44 @@ $bundles = array(
 );
 ```
 
-
-
-## Why Use This
-
-You have your choice in user-agent parsers. This one detects **all modern browsers** in a very light, quick, understandable fashion. 
-It is less than 200 lines of code, and consists of just three regular expressions!
-It can also correctly identify exotic versions of IE others fail on.
-
-It offers 100% unit test coverage, is installable via Composer, and is very easy to use.
-
-## What It Does Not Do
-
-### OS Versions
-
-User-agent strings **are not** a reliable source of OS Version!
-
-- Many agents simply don't send the information. 
-- Others provide varying levels of accuracy.
-- Parsing Windows versions alone almost nearly doubles the size of the code.
-
-I'm much more interested in keeping this thing *tiny* and accurate than adding niché features and would rather focus on things that can be **done well**.
-
-All that said, there is the start of a [branch to do it](https://github.com/donatj/PhpUserAgent/tree/os_version_detection) I created for a client if you want to poke it, I update it from time to time, but frankly if you need to *reliably detect OS Version*, using user-agent isn't the way to do it. I'd go with JavaScript.
-
-## Requirements
-
-  - PHP 5.3.0+
-
-## Installing
-
-PHP User Agent is available through Packagist via Composer.
-
-```json
-{
-	"require": {
-		"donatj/phpuseragentparser": "*"
-	}
-}
+routing.yml:
+```yaml
+mrapps_onesignal:
+    resource: "@MrappsOnesignalBundle/Controller/"
+    prefix:   /
 ```
 
-## Sample Usage
+config.yml (configurazione completa):
+```yaml
+doctrine:
+    [...]
+    orm:
+        [...]
+        resolve_target_entities:
+            [...]
+            Mrapps\OnesignalBundle\Model\UserInterface: [[ CLASSE USER ALL'INTERNO DEL PROGETTO (es. AppBundle\Entity\User) ]]
 
-```php
-$ua_info = parse_user_agent();
-/*
-array(
-	'platform' => '[Detected Platform]',
-	'browser'  => '[Detected Browser]',
-	'version'  => '[Detected Browser Version]',
-);
-*/
+
+mrapps_onesignal:
+    parameters:
+        app_id: [[ APP ID ONE SIGNAL ]]
+        app_name: [[ NOME APP ]]
+    web_push:
+        rest_api_key: [[ API KEY CHIAMATE REST ]]
+        gcm_sender_id: [[ ID PER NOTIFICHE PUSH CHROME ]]
+        safari_web_id: [[ ID PER NOTIFICHE PUSH SAFARI ]]
 ```
 
-## Currently Detected Platforms
+## Utilizzo
+```twig
+{#
+- Aggiungere questa riga nel punto in cui si vuole renderizzare il blocco javascript per attivare le notifiche OneSignal.
 
-- Desktop
-	- Windows
-	- Linux
-	- Macintosh
-	- Chrome OS
-- Mobile
-	- Android
-	- iPhone
-	- iPad / iPod Touch
-	- Windows Phone OS
-	- Kindle
-	- Kindle Fire
-	- BlackBerry
-	- Playbook
-	- Tizen
-- Console
-	- Nintendo 3DS
-	- New Nintendo 3DS
-	- Nintendo Wii
-	- Nintendo WiiU
-	- PlayStation 3
-	- PlayStation 4
-	- PlayStation Vita
-	- Xbox 360
-	- Xbox One
+- INCLUDERE JQUERY PRIMA DI QUESTA RIGA!!!
 
-## Currently Detected Browsers
+- Se si vogliono passare i parametri device_name, device_version e platform (opzionali), creare una rotta in un proprio controller, leggere i dati in qualche modo (ad esempio parsando lo user agent) e forwardare il controller nel bundle MrappsOnesignal.
+#}
+{{ render(controller('MrappsOnesignalBundle:Onesignal:__js', {'device_name':'[[ NOME BROWSER ]]', 'device_version':'[[ VERSIONE BROWSER ]]', 'platform':'[[ NOME SO ]]'})) }}
+```
 
-- Android Browser
-- BlackBerry Browser
-- Camino
-- Kindle / Silk
-- Firefox / Iceweasel
-- Safari
-- Internet Explorer
-- IEMobile
-- Chrome
-- Opera
-- Midori
-- Vivaldi
-- TizenBrowser
-- Lynx
-- Wget
-- Curl
-
-
-
-More information is available at [Donat Studios](http://donatstudios.com/PHP-Parser-HTTP_USER_AGENT).
+  - Copiare i file "OneSignalSDKWorker.js" e "OneSignalSDKUpdaterWorker.js" dalla cartella "public/js" del bundle alla root del progetto WEB. Il file MANIFEST verrà generato direttamente inline all'interno della pagina.

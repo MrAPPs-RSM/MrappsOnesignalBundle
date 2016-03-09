@@ -1,13 +1,4 @@
-<meta name="manifest" content='{
-    "name": "{{ app_name }}",
-    "short_name": "{{ app_name }}",
-    "start_url": "/",
-    {% if gcm_sender_id is defined and gcm_sender_id|length > 0 %}
-    "gcm_sender_id": "{{ gcm_sender_id }}",
-    "gcm_user_visible_only": true,
-    {% endif %}
-    "display": "standalone"
-}'>
+<link rel="manifest" href="{{ asset("manifest.json") }}">
 <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async></script>
 <script>
     var OneSignal = OneSignal || [];

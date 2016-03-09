@@ -55,7 +55,11 @@ mrapps_onesignal:
 
 ## Utilizzo
 
-- Copiare i file **OneSignalSDKWorker.js** e **OneSignalSDKUpdaterWorker.js** dalla cartella **public/js** del bundle alla root del progetto WEB. Il file MANIFEST verrà generato direttamente inline all'interno della pagina.
+
+Generazione files necessari in cartella ROOT WEB:
+```!/bin/bash
+app/console mrapps:onesignal:generatefiles
+```
 
 
 Attivazione notifiche lato client:

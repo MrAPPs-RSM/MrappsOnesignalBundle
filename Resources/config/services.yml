@@ -2,3 +2,9 @@ services:
     mrapps.onesignal:
         class: Mrapps\OnesignalBundle\Handler\OnesignalHandler
         arguments:  [@service_container, @doctrine.orm.entity_manager]
+
+    mrapps.onesignal.generatefiles_command:
+        class: Mrapps\OnesignalBundle\Command\GenerateFilesCommand
+        arguments:  [@service_container]
+        tags:
+            -  { name: console.command }

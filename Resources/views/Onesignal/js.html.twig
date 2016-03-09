@@ -2,7 +2,8 @@
     "name": "{{ app_name }}",
     "short_name": "{{ app_name }}",
     "start_url": "/",
-    {% if gcm_sender_id is defined and gcm_sender_id|length > 0 %}"gcm_sender_id": "{{ gcm_sender_id }}",
+    {% if gcm_sender_id is defined and gcm_sender_id|length > 0 %}
+    "gcm_sender_id": "{{ gcm_sender_id }}",
     "gcm_user_visible_only": true,
     {% endif %}
     "display": "standalone"
@@ -13,7 +14,9 @@
     OneSignal.push(["init", {
         appId: "{{ app_id }}",
         autoRegister: true,
-        {% if safari_web_id is defined and safari_web_id|length > 0 %}safari_web_id: "{{ safari_web_id }}",{% endif %}
+        {% if safari_web_id is defined and safari_web_id|length > 0 %}
+        safari_web_id: "{{ safari_web_id }}",
+        {% endif %}
         notifyButton: {
             enable: false
         }
@@ -32,9 +35,15 @@
             $.ajax({
                 url: "{{ path('mrapps_onesignal_regplayer') }}",
                 data: $.extend({}, ids, {
-                    {% if device_name is defined and device_name|length > 0 %}device_name: "{{ device_name }}",{% endif %}
-                    {% if device_version is defined and device_version|length > 0 %}device_version: "{{ device_version }}",{% endif %}
-                    {% if platform is defined and platform|length > 0 %}platform: "{{ platform }}",{% endif %}
+                    {% if device_name is defined and device_name|length > 0 %}
+                    device_name: "{{ device_name }}",
+                    {% endif %}
+                    {% if device_version is defined and device_version|length > 0 %}
+                    device_version: "{{ device_version }}",
+                    {% endif %}
+                    {% if platform is defined and platform|length > 0 %}
+                    platform: "{{ platform }}",
+                    {% endif %}
                 }),
                 method: "POST"
             });

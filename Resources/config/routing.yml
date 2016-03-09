@@ -1,4 +1,0 @@
-mrapps_onesignal:
-    resource: "@MrappsOnesignalBundle/Controller/"
-    type:     annotation
-    prefix:   /

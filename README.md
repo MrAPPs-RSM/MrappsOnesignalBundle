@@ -55,7 +55,8 @@ mrapps_onesignal:
 
 ## Utilizzo
 
-- Copiare i file "OneSignalSDKWorker.js" e "OneSignalSDKUpdaterWorker.js" dalla cartella "public/js" del bundle alla root del progetto WEB. Il file MANIFEST verrà generato direttamente inline all'interno della pagina.
+- Copiare i file **OneSignalSDKWorker.js** e **OneSignalSDKUpdaterWorker.js** dalla cartella **public/js** del bundle alla root del progetto WEB. Il file MANIFEST verrà generato direttamente inline all'interno della pagina.
+
 
 Attivazione notifiche lato client:
 ```twig
@@ -74,10 +75,12 @@ Attivazione notifiche lato client:
 {{ render(controller('MrappsOnesignalBundle:Onesignal:__js', {'device_name':'[[ NOME BROWSER ]]', 'device_version':'[[ VERSIONE BROWSER ]]', 'platform':'[[ NOME SO ]]'})) }}
 ```
 
+
 Servizio:
 ```php
 $os = $this->container->get('mrapps.onesignal');
 ```
+
 
 Invio notifica:
 ```php
@@ -91,11 +94,13 @@ $segments = array('All');   //Opzionale; se non viene passato, la notifica verr�
 $os->sendNotification($data, $segments);
 ```
 
+
 Disattiva un dispositivo (player):
 ```php
 $playerID = 'ID del dispositivo su OneSignal';
 $os->deactivatePlayer($playerID);
 ```
+
 
 Disattiva tutti i dispositivi associati ad un utente:
 ```php

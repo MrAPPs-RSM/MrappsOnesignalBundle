@@ -10,18 +10,26 @@ use Mrapps\OnesignalBundle\Model\UserInterface;
  */
 class UserPlayerRepository extends \Doctrine\ORM\EntityRepository
 {
-    public function getAllPlayersByUser(UserInterface $user = null) {
+    public function getAllPlayersByUsers($users = array()) {
 
         $output = array();
+        if(!is_array($users)) $users = array($users);
 
-        if($user !== null) {
+        if(count($users) > 0) {
 
             $em = $this->getEntityManager();
 
-            $ups = $em->getRepository('MrappsOnesignalBundle:UserPlayer')->findBy(array('user' => $user));
+            $ups = $em->createQuery("
+                SELECT up
+                FROM MrappsOnesignalBundle:UserPlayer up
+                WHERE up.user IN (?1)
+            ")->setParameter('1', $users)->execute();
+
             foreach($ups as $up) {
                 $playerId = ($up->getPlayer() !== null) ? trim($up->getPlayer()->getPlayerId()) : '';
-                if(strlen($playerId) > 0) $output[] = $playerId;
+                if(strlen($playerId) > 0 && !in_array($playerId, $output)) {
+                    $output[] = $playerId;
+                }
             }
         }
 

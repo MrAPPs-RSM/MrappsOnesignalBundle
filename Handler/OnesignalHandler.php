@@ -118,7 +118,19 @@ class OnesignalHandler
 
     public function sendNotificationToUser($data = array(), UserInterface $user = null) {
 
-        $players = $this->em->getRepository('MrappsOnesignalBundle:UserPlayer')->getAllPlayersByUser($user);
+        $players = $this->em->getRepository('MrappsOnesignalBundle:UserPlayer')->getAllPlayersByUsers($user);
+        if(count($players) > 0) {
+            return $this->sendNotification($data, 'players', $players);
+        }
+
+        return null;
+    }
+
+    public function sendNotificationToMultipleUsers($data = array(), $users = array()) {
+
+        if(!is_array($users)) $users = array();
+
+        $players = $this->em->getRepository('MrappsOnesignalBundle:UserPlayer')->getAllPlayersByUsers($users);
         if(count($players) > 0) {
             return $this->sendNotification($data, 'players', $players);
         }

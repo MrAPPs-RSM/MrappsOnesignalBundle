@@ -110,16 +110,25 @@ $sendTo = array('All');
 $os->sendNotification($data, $type, $segments);
 ```
 
+
 Invio notifica a tutti i dispositivi di uno specifico utente:
 ```php
-$data = array(
-    'message' => 'Corpo della notifica',
-    'title' => 'Titolo della notifica',     //Opzionale; se non viene passato, verrà impostato di default il nome dell'app
-    'url' => 'URL da visitare al click sulla notifica', //Opzionale
-);
+$data = array();    //Vedi esempio "Invio notifica"
 
 $os->sendNotificationToUser($data, $user);
 ```
+
+
+Invio notifica a tutti i dispositivi di uno specifico utente:
+```php
+$data = array();    //Vedi esempio "Invio notifica"
+
+$users = array();   //Array di utenti (classe che implementa Mrapps/OnesignalBundle/Model/UserInterface)
+
+$os->sendNotificationToMultipleUsers($data, $users);
+```
+
+
 
 
 Disattiva un dispositivo (player):

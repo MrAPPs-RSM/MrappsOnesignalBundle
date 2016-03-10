@@ -107,7 +107,7 @@ $type = 'segments';
 
 $sendTo = array('All');
 
-$os->sendNotification($data, $type, $segments);
+$os->sendNotification($data, $type, $sendTo);
 ```
 
 

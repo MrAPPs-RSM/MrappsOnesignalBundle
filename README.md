@@ -119,7 +119,7 @@ $os->sendNotificationToUser($data, $user);
 ```
 
 
-Invio notifica a tutti i dispositivi di uno specifico utente:
+Invio notifica a più utenti:
 ```php
 $data = array();    //Vedi esempio "Invio notifica"
 

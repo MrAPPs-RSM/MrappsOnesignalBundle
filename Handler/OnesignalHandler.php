@@ -120,7 +120,7 @@ class OnesignalHandler
 
         $players = $this->em->getRepository('MrappsOnesignalBundle:UserPlayer')->getAllPlayersByUser($user);
         if(count($players) > 0) {
-            return $this->sendNotification($data, 'players', $user);
+            return $this->sendNotification($data, 'players', $players);
         }
 
         return null;

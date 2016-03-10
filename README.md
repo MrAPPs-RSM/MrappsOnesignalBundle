@@ -93,9 +93,32 @@ $data = array(
     'title' => 'Titolo della notifica',     //Opzionale; se non viene passato, verrà impostato di default il nome dell'app
     'url' => 'URL da visitare al click sulla notifica', //Opzionale
 );
-$segments = array('All');   //Opzionale; se non viene passato, la notifica verrà inviata di default a tutti gli utenti.
 
-$os->sendNotification($data, $segments);
+/*
+    Valori possibili:
+
+    segments: valorizzare $sendTo (3° parametro) con l'array dei gruppi (segments) a cui inviare la notifica. Se non
+              viene specificato niente, la notifica verrà inviata al segmento All (tutti gli utenti).
+              
+    players: valorizzare $sendTo (3° parametro) con l'array dei playerID a cui inviare la notifica. Se non viene specificato
+             niente, non verrà inviata nessuna notifica.
+*/
+$type = 'segments';
+
+$sendTo = array('All');
+
+$os->sendNotification($data, $type, $segments);
+```
+
+Invio notifica a tutti i dispositivi di uno specifico utente:
+```php
+$data = array(
+    'message' => 'Corpo della notifica',
+    'title' => 'Titolo della notifica',     //Opzionale; se non viene passato, verrà impostato di default il nome dell'app
+    'url' => 'URL da visitare al click sulla notifica', //Opzionale
+);
+
+$os->sendNotificationToUser($data, $user);
 ```
 
 

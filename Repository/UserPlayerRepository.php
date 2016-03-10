@@ -10,6 +10,24 @@ use Mrapps\OnesignalBundle\Model\UserInterface;
  */
 class UserPlayerRepository extends \Doctrine\ORM\EntityRepository
 {
+    public function getAllPlayersByUser(UserInterface $user = null) {
+
+        $output = array();
+
+        if($user !== null) {
+
+            $em = $this->getEntityManager();
+
+            $ups = $em->getRepository('MrappsOnesignalBundle:UserPlayer')->findBy(array('user' => $user));
+            foreach($ups as $up) {
+                $playerId = ($up->getPlayer() !== null) ? trim($up->getPlayer()->getPlayerId()) : '';
+                if(strlen($playerId) > 0) $output[] = $playerId;
+            }
+        }
+
+        return $output;
+    }
+
     public function unsetUserPlayers(UserInterface $user = null) {
 
         if($user !== null) {

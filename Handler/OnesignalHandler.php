@@ -6,10 +6,15 @@ use Symfony\Component\DependencyInjection\Container;
 use Doctrine\ORM\EntityManager;
 use Mrapps\OnesignalBundle\Model\UserInterface;
 
+
 class OnesignalHandler
 {
     private $container;
     private $em;
+    private $allowedTypes = array(
+        'segments',
+        'players',
+    );
     
     public function __construct(Container $container, EntityManager $em)
     {
@@ -28,7 +33,17 @@ class OnesignalHandler
         );
     }
 
-    public function sendNotification($data = array(), $segments = null) {
+    private function getCorrectSendToType($type) {
+
+        $type = strtolower(trim($type));
+        if(!in_array($type, $this->allowedTypes)) {
+            $type = null;
+        }
+
+        return $type;
+    }
+
+    public function sendNotification($data = array(), $type = null, $sendTo = array()) {
 
         //Sistemazioni parametri
         if(!is_array($data)) $data = array();
@@ -36,9 +51,9 @@ class OnesignalHandler
         $title = (isset($data['title'])) ? trim($data['title']) : '';
         $url = (isset($data['url'])) ? trim($data['url']) : '';
 
-        if(!is_array($segments)) $segments = array('All');
+        $type = $this->getCorrectSendToType($type);
 
-        if(strlen($message) > 0) {
+        if(strlen($message) > 0 && $type !== null) {
 
             $params = $this->getParameters();
 
@@ -51,10 +66,21 @@ class OnesignalHandler
             //Parametri di base
             $fields = array(
                 'app_id' => $params['app_id'],
-                'included_segments' => $segments,
                 'contents' => $content,
                 'isAnyWeb' => 1,
             );
+
+            switch($type) {
+                case 'segments':
+                    if(!is_array($sendTo)) $sendTo = array('All');
+                    $fields['included_segments'] = $sendTo;
+                    break;
+                case 'players':
+                    if(!is_array($sendTo)) $sendTo = array();
+                    $fields['include_player_ids'] = $sendTo;
+                    break;
+            }
+
 
             //Titolo della notifica
             if(strlen($title) > 0) {
@@ -85,6 +111,16 @@ class OnesignalHandler
             curl_close($ch);
 
             return $response;
+        }
+
+        return null;
+    }
+
+    public function sendNotificationToUser($data = array(), UserInterface $user = null) {
+
+        $players = $this->em->getRepository('MrappsOnesignalBundle:UserPlayer')->getAllPlayersByUser($user);
+        if(count($players) > 0) {
+            return $this->sendNotification($data, 'players', $user);
         }
 
         return null;

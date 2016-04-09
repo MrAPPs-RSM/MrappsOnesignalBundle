@@ -64,9 +64,10 @@ class UserPlayerRepository extends \Doctrine\ORM\EntityRepository
             //Elimina i Player inattivi
             foreach ($players as $p) {
                 if (Utils::deactivatePlayer($p->getPlayerId())) {
-                    $em->getRepository('MrappsOnesignalBundle:Player')->deleteInactivePlayer($p);
+                    $em->getRepository('MrappsOnesignalBundle:Player')->deleteInactivePlayer($p, false);
                 }
             }
+            $em->flush();
 
             return true;
         }

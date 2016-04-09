@@ -12,19 +12,21 @@ use Mrapps\OnesignalBundle\Entity\UserPlayer;
  */
 class PlayerRepository extends \Doctrine\ORM\EntityRepository
 {
-    public function addPlayer(UserInterface $user = null, $playerID = '', $extraData = array()) {
-        
+    public function addPlayer(UserInterface $user = null, $playerID = '', $extraData = array())
+    {
+
         $output = array(
             'player' => null,
             'user_player' => null,
+            'success' => false,
         );
 
-        if($user !== null && strlen($playerID) > 0) {
+        if ($user !== null && strlen($playerID) > 0) {
 
             $em = $this->getEntityManager();
 
             //Informazioni aggiuntive
-            if(!is_array($extraData)) $extraData = array();
+            if (!is_array($extraData)) $extraData = array();
             $deviceName = (isset($extraData['device_name'])) ? trim($extraData['device_name']) : null;
             $deviceVersion = (isset($extraData['device_version'])) ? trim($extraData['device_version']) : null;
             $platform = (isset($extraData['platform'])) ? trim($extraData['platform']) : null;
@@ -34,7 +36,7 @@ class PlayerRepository extends \Doctrine\ORM\EntityRepository
             $player = $this->findOneBy(array('playerId' => $playerID));
 
             //Creazione nuovo Player
-            if($player == null) {
+            if ($player == null) {
                 $player = new Player();
                 $player->setPlayerId($playerID);
             }
@@ -50,7 +52,7 @@ class PlayerRepository extends \Doctrine\ORM\EntityRepository
 
             //Associazione UserInterface-Player
             $up = $em->getRepository('MrappsOnesignalBundle:UserPlayer')->findOneBy(array('user' => $user, 'player' => $player));
-            if($up == null) {
+            if ($up == null) {
 
                 $up = new UserPlayer();
                 $up->setUser($user);
@@ -62,31 +64,63 @@ class PlayerRepository extends \Doctrine\ORM\EntityRepository
 
             $output['player'] = $player;
             $output['user_player'] = $up;
+            $output['success'] = true;
         }
-        
+
         return $output;
     }
-    
-    public function deleteInactivePlayer(Player $player = null) {
-        
-        if($player !== null) {
-            
+
+    public function deletePlayer($playerId = null, $autoFlush = true)
+    {
+        if ($playerId !== null) {
+
             $em = $this->getEntityManager();
-            
+
+
+            $player = $em->getRepository("MrappsOnesignalBundle:Player")->findOneBy(array("playerId", $playerId));
+
+            if (!$player)
+                return false;
+
+            //Elimina le associazioni user player
+            $em->createQuery("
+                DELETE FROM MrappsOnesignalBundle:UserPlayer up
+                WHERE up.player = :player
+            ")->setParameters(array('player' => $player))->execute();
+
+            $em->remove($player);
+
+            if ($autoFlush)
+                $em->flush();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function deleteInactivePlayer(Player $player = null, $autoFlush = true)
+    {
+        if ($player !== null) {
+
+            $em = $this->getEntityManager();
+
             //Elimina il player solo se non c'è nessun utente associato
             $ups = $em->createQuery("
                 SELECT COUNT(up)
                 FROM MrappsOnesignalBundle:UserPlayer up
                 WHERE up.player = :player
             ")->setParameters(array('player' => $player))->getSingleScalarResult();
-            if(count($ups) == 0) {
+            if (count($ups) == 0) {
                 $em->remove($player);
-                $em->flush();
-                
+
+                if ($autoFlush)
+                    $em->flush();
+
                 return true;
             }
         }
-        
+
         return false;
     }
 }

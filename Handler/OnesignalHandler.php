@@ -144,9 +144,20 @@ class OnesignalHandler
         return null;
     }
 
-    public function deactivatePlayer($playerID = '')
+    public function addPlayer(UserInterface $user = null, $playerID = '', $extraData = array())
     {
-        return Utils::deactivatePlayer($playerID);
+        return $this->em->getRepository("MrappsOnesignalBundle:Player")->addPlayer($user, $playerID, $extraData);
+    }
+
+    public function deactivatePlayer($playerID = '', $deletePlayer = true)
+    {
+        $success = Utils::deactivatePlayer($playerID);
+
+        if ($success && $deletePlayer) {
+            $this->em->getRepository('MrappsOnesignalBundle:Player')->deletePlayer($playerID);
+        }
+
+        return $success;
     }
 
     public function deactivateAllPlayersForUser(UserInterface $user = null)

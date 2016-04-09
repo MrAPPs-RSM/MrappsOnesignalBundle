@@ -32,6 +32,7 @@ class Utils
             $result = json_decode($response, true);
 
             if ($result !== null) {
+
                 return true;
             }
         }

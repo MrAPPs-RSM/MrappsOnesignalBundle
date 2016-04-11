@@ -46,32 +46,67 @@ class OnesignalHandler
         return $type;
     }
 
+    /**
+     * Invia una notifica.
+     *
+     * @param array $data array che contiene array/string message, array/string title,url,array parameters per specificare altri parametri
+     * @param string $type segments/players
+     * @param array $sendTo array di players o segmenti verso cui inviare la notifica
+     *
+     * @return array Ritorna se la chiamata è stata eseguita correttamente ed eventuali errori specificati nella chiamata
+     *
+     */
     public function sendNotification($data = array(), $type = null, $sendTo = array())
     {
+        $result = array("success" => false, "message" => "Parametri non corretti", "error_code" => 1001);//parametri passati non corretti
 
         //Sistemazioni parametri
         if (!is_array($data)) $data = array();
-        $message = (isset($data['message'])) ? trim($data['message']) : '';
-        $title = (isset($data['title'])) ? trim($data['title']) : '';
+
+        if (!isset($data['message']) || empty($data['message'])) {
+            return $result;
+        }
+
+        if (!is_array($data['message'])) {
+            $messages = array(
+                'en' => $data['message'],
+                'it' => $data['message'],
+            );
+        } else {
+            foreach ($data['message'] as $mess) {
+                if (empty($mess)) {
+                    return $result;
+                }
+            }
+
+            $messages = $data['message'];
+        }
+
+        $titles = null;
+        if (isset($data['title'])) {
+            if (!is_array($data['title'])) {
+                $titles = array(
+                    'en' => $data['title'],
+                    'it' => $data['title'],
+                );
+            } else {
+                $titles = $data['title'];
+            }
+        }
+
         $url = (isset($data['url'])) ? trim($data['url']) : '';
+
 
         $type = $this->getCorrectSendToType($type);
 
-        if (strlen($message) > 0 && $type !== null) {
+        if (count($messages) > 0 && $type !== null) {
 
             $params = $this->getParameters();
-
-            //Messaggio
-            $content = array(
-                'en' => $message,
-                'it' => $message,
-            );
 
             //Parametri di base
             $fields = array(
                 'app_id' => $params['app_id'],
-                'contents' => $content,
-                'isAnyWeb' => 1,
+                'contents' => $messages,
             );
 
             switch ($type) {
@@ -87,12 +122,10 @@ class OnesignalHandler
 
 
             //Titolo della notifica
-            if (strlen($title) > 0) {
-                $headings = array(
-                    'en' => $title,
-                    'it' => $title,
-                );
-                $fields['headings'] = $headings;
+            if ($titles !== null &&
+                count($titles) > 0
+            ) {
+                $fields['headings'] = $titles;
             }
 
             //URL da aprire al click sulla notifica
@@ -100,6 +133,9 @@ class OnesignalHandler
                 $fields['url'] = $url;
             }
 
+            if (isset($data["parameters"])) {
+                $fields = array_merge($fields, $data["parameters"]);
+            }
 
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
@@ -114,10 +150,50 @@ class OnesignalHandler
             $response = curl_exec($ch);
             curl_close($ch);
 
-            return $response;
+
+            if ($response === false) {
+                $result["message"] = "Non è stato possibile inviare la notifica";
+                $result["error_code"] = 1002;//errore curl
+
+                return $result;
+            }
+
+            $responseArr = json_decode($response, true);
+
+            if ($responseArr !== null) {
+
+                if (isset($responseArr["errors"])) {
+
+                    if (is_array($responseArr["errors"])) {
+                        if (array_key_exists("invalid_player_ids", $responseArr["errors"])) {
+
+                            foreach ($responseArr["errors"]["invalid_player_ids"] as $playerId) {
+                                $this->em->getRepository("MrappsOnesignalBundle:Player")->deletePlayer($playerId, false);
+                            }
+                            $this->em->flush();
+                        }else{
+                            foreach ($responseArr["errors"] as $error) {
+                                $result["message"] = $error;
+                                $result["error_code"] = 1003;//All included players are not subscribed
+                            }
+                        }
+                    }
+
+                } else {
+                    $result["success"] = true;
+                    $result["message"] = null;
+                    $result["error_code"] = null;
+                }
+
+                return $result;
+            }
+
+            $result["message"] = "Non è stato possibile inviare la notifica";
+            $result["error_code"] = 1002; //la risposta non è json
+            return $result;
         }
 
-        return null;
+        return $result;
     }
 
     public function sendNotificationToUser($data = array(), UserInterface $user = null)
@@ -137,6 +213,18 @@ class OnesignalHandler
         if (!is_array($users)) $users = array();
 
         $players = $this->em->getRepository('MrappsOnesignalBundle:UserPlayer')->getAllPlayersByUsers($users);
+        if (count($players) > 0) {
+            return $this->sendNotification($data, 'players', $players);
+        }
+
+        return null;
+    }
+
+    public function sendNotificationToMultiplePlayers($data = array(), $players = array())
+    {
+
+        if (!is_array($players)) $players = array();
+
         if (count($players) > 0) {
             return $this->sendNotification($data, 'players', $players);
         }

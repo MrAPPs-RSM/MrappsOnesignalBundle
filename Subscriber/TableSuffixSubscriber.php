@@ -26,7 +26,7 @@ class TableSuffixSubscriber implements EventSubscriber
     public function loadClassMetadata(LoadClassMetadataEventArgs $args)
     {
         $classMetadata = $args->getClassMetadata();
-        if(is_subclass_of($classMetadata->getName(), $this->oneSignalBaseEntity)) {
+        if(is_subclass_of($classMetadata->getName(), $this->oneSignalBaseEntity) && strlen($this->suffix) > 0) {
 
             if ($classMetadata->isInheritanceTypeSingleTable() && !$classMetadata->isRootEntity()) {
                 // if we are in an inheritance hierarchy, only apply this once

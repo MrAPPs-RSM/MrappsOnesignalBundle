@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 class TableSuffixSubscriber implements EventSubscriber
 {
+    private $oneSignalBaseEntity = 'Mrapps\OnesignalBundle\\Entity\\Base';
     protected $suffix = '';
 
     public function __construct($container)
@@ -25,17 +26,20 @@ class TableSuffixSubscriber implements EventSubscriber
     public function loadClassMetadata(LoadClassMetadataEventArgs $args)
     {
         $classMetadata = $args->getClassMetadata();
-        if ($classMetadata->isInheritanceTypeSingleTable() && !$classMetadata->isRootEntity()) {
-            // if we are in an inheritance hierarchy, only apply this once
-            return;
-        }
+        if(is_subclass_of($classMetadata->getName(), $this->oneSignalBaseEntity)) {
 
-        $classMetadata->setTableName($classMetadata->getTableName().'_'.$this->suffix);
+            if ($classMetadata->isInheritanceTypeSingleTable() && !$classMetadata->isRootEntity()) {
+                // if we are in an inheritance hierarchy, only apply this once
+                return;
+            }
 
-        foreach ($classMetadata->getAssociationMappings() as $fieldName => $mapping) {
-            if ($mapping['type'] == ClassMetadataInfo::MANY_TO_MANY) {
-                $mappedTableName = $classMetadata->associationMappings[$fieldName]['joinTable']['name'];
-                $classMetadata->associationMappings[$fieldName]['joinTable']['name'] = $mappedTableName.'_'.$this->suffix;
+            $classMetadata->setTableName($classMetadata->getTableName().'_'.$this->suffix);
+
+            foreach ($classMetadata->getAssociationMappings() as $fieldName => $mapping) {
+                if ($mapping['type'] == ClassMetadataInfo::MANY_TO_MANY) {
+                    $mappedTableName = $classMetadata->associationMappings[$fieldName]['joinTable']['name'];
+                    $classMetadata->associationMappings[$fieldName]['joinTable']['name'] = $mappedTableName.'_'.$this->suffix;
+                }
             }
         }
     }

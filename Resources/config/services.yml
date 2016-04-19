@@ -8,3 +8,9 @@ services:
         arguments:  [@service_container]
         tags:
             -  { name: console.command }
+
+    mrapps.onesignal.tblsuffix_subscriber:
+            class: Mrapps\OnesignalBundle\Subscriber\TableSuffixSubscriber
+            arguments: [@service_container]
+            tags:
+                - { name: doctrine.event_subscriber }

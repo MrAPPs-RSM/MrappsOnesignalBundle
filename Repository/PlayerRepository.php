@@ -77,7 +77,7 @@ class PlayerRepository extends \Doctrine\ORM\EntityRepository
             $em = $this->getEntityManager();
 
 
-            $player = $em->getRepository("MrappsOnesignalBundle:Player")->findOneBy(array("playerId", $playerId));
+            $player = $em->getRepository("MrappsOnesignalBundle:Player")->findOneBy(array("playerId" => $playerId));
 
             if (!$player)
                 return false;

@@ -130,6 +130,16 @@ $os->sendNotificationToMultipleUsers($data, $users);
 
 
 
+Aggiunge un nuovo dispositivo (player):
+```php
+$user = null;			//Utente a cui associare il nuovo Player
+$playerID = '';			//ID del dispositivo su OneSignal
+$extraData = array();		//Array di parametri aggiuntivi
+
+$os->addPlayer($user, $playerID, $extraData);
+```
+
+
 
 Disattiva un dispositivo (player):
 ```php

@@ -130,6 +130,17 @@ $os->sendNotificationToMultipleUsers($data, $users);
 
 
 
+Invio notifica a più Players:
+```php
+$data = array();    //Vedi esempio "Invio notifica"
+
+$players = array();   //Array di PlayerID
+
+$os->sendNotificationToMultiplePlayers($data, $players);
+```
+
+
+
 Aggiunge un nuovo dispositivo (player):
 ```php
 $user = null;			//Utente a cui associare il nuovo Player

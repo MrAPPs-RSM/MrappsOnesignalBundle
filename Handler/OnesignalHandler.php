@@ -96,6 +96,8 @@ class OnesignalHandler
 
         $url = (isset($data['url'])) ? trim($data['url']) : '';
 
+        $templateID = (isset($data['template'])) ? trim($data['template']) : '';
+
 
         $type = $this->getCorrectSendToType($type);
 
@@ -131,6 +133,11 @@ class OnesignalHandler
             //URL da aprire al click sulla notifica
             if (strlen($url) > 0) {
                 $fields['url'] = $url;
+            }
+
+            //Template da utilizzare
+            if (strlen($templateID) > 0) {
+                $fields['template_id'] = $templateID;
             }
 
             if (isset($data["parameters"])) {

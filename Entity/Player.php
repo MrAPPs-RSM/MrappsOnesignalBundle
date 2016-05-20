@@ -29,28 +29,28 @@ class Player extends Base
     /**
      * @var string
      *
-     * @ORM\Column(name="device_name", type="string", length=255)
+     * @ORM\Column(name="device_name", type="string", length=255, nullable=true)
      */
     protected $deviceName;
     
     /**
      * @var string
      *
-     * @ORM\Column(name="device_version", type="string", length=255)
+     * @ORM\Column(name="device_version", type="string", length=255, nullable=true)
      */
     protected $deviceVersion;
     
     /**
      * @var string
      *
-     * @ORM\Column(name="platform", type="string", length=255)
+     * @ORM\Column(name="platform", type="string", length=255, nullable=true)
      */
     protected $platform;
     
     /**
      * @var string
      *
-     * @ORM\Column(name="registration_id", type="string", length=255)
+     * @ORM\Column(name="registration_id", type="string", length=255, nullable=true)
      */
     protected $registrationId;
 

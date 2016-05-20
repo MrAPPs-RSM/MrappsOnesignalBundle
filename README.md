@@ -92,6 +92,8 @@ $data = array(
     'message' => 'Corpo della notifica',
     'title' => 'Titolo della notifica',     //Opzionale; se non viene passato, verrà impostato di default il nome dell'app
     'url' => 'URL da visitare al click sulla notifica', //Opzionale
+    'template' => 'ID del template da utilizzare',	//Opzionale
+    'parameters' => array(),	//Opzionale; eventuali altri parametri da settare
 );
 
 /*

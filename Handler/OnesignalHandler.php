@@ -63,10 +63,10 @@ class OnesignalHandler
         //Sistemazioni parametri
         if (!is_array($data)) $data = array();
 
-        //Invio notifica in background - Android
-        $androidBackgroundData = (isset($data['android_background_data'])) ? (bool)$data['android_background_data'] : false;
+        //Notifica in background?
+        $isBackgroundNotification = (isset($data['background'])) ? (bool)$data['background'] : false;
 
-        if (!$androidBackgroundData && (!isset($data['message']) || empty($data['message']))) {
+        if (!$isBackgroundNotification && (!isset($data['message']) || empty($data['message']))) {
             return $result;
         }
 
@@ -77,7 +77,7 @@ class OnesignalHandler
             );
         } else {
             foreach ($data['message'] as $mess) {
-                if (!$androidBackgroundData && empty($mess)) {
+                if (!$isBackgroundNotification && empty($mess)) {
                     return $result;
                 }
             }
@@ -104,7 +104,7 @@ class OnesignalHandler
 
         $type = $this->getCorrectSendToType($type);
 
-        if (($androidBackgroundData || count($messages) > 0) && $type !== null) {
+        if (($isBackgroundNotification || count($messages) > 0) && $type !== null) {
 
             $params = $this->getParameters();
 
@@ -112,7 +112,7 @@ class OnesignalHandler
             $fields = array(
                 'app_id' => $params['app_id'],
             );
-            if(!$androidBackgroundData) {
+            if(!$isBackgroundNotification) {
                 $fields['contents'] = $messages;    //Se la notifica è Background (Android) non setto il content
             }
 
@@ -148,6 +148,9 @@ class OnesignalHandler
             if (isset($data["parameters"])) {
                 $fields = array_merge($fields, $data["parameters"]);
             }
+
+            //Background - Android
+            $fields['android_background_data'] = $isBackgroundNotification;
 
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");

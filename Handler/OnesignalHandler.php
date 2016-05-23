@@ -63,7 +63,10 @@ class OnesignalHandler
         //Sistemazioni parametri
         if (!is_array($data)) $data = array();
 
-        if (!isset($data['message']) || empty($data['message'])) {
+        //Invio notifica in background - Android
+        $androidBackgroundData = (isset($data['android_background_data'])) ? (bool)$data['android_background_data'] : false;
+
+        if (!$androidBackgroundData && (!isset($data['message']) || empty($data['message']))) {
             return $result;
         }
 
@@ -74,7 +77,7 @@ class OnesignalHandler
             );
         } else {
             foreach ($data['message'] as $mess) {
-                if (empty($mess)) {
+                if (!$androidBackgroundData && empty($mess)) {
                     return $result;
                 }
             }
@@ -101,15 +104,17 @@ class OnesignalHandler
 
         $type = $this->getCorrectSendToType($type);
 
-        if (count($messages) > 0 && $type !== null) {
+        if (($androidBackgroundData || count($messages) > 0) && $type !== null) {
 
             $params = $this->getParameters();
 
             //Parametri di base
             $fields = array(
                 'app_id' => $params['app_id'],
-                'contents' => $messages,
             );
+            if(!$androidBackgroundData) {
+                $fields['contents'] = $messages;    //Se la notifica è Background (Android) non setto il content
+            }
 
             switch ($type) {
                 case 'segments':

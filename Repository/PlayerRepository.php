@@ -111,7 +111,7 @@ class PlayerRepository extends \Doctrine\ORM\EntityRepository
                 FROM MrappsOnesignalBundle:UserPlayer up
                 WHERE up.player = :player
             ")->setParameters(array('player' => $player))->getSingleScalarResult();
-            if (count($ups) == 0) {
+            if ($ups == 0) {
                 $em->remove($player);
 
                 if ($autoFlush)

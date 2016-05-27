@@ -64,9 +64,9 @@ class OnesignalHandler
         if (!is_array($data)) $data = array();
 
         //Notifica in background?
-        $isBackgroundNotification = (isset($data['background'])) ? (bool)$data['background'] : false;
+        $isBackgroundNotification = (isset($data['background'])) ? (bool)$data['background'] : null;
 
-        if (!$isBackgroundNotification && (!isset($data['message']) || empty($data['message']))) {
+        if ($isBackgroundNotification == false && (!isset($data['message']) || empty($data['message']))) {
             return $result;
         }
 
@@ -77,7 +77,7 @@ class OnesignalHandler
             );
         } else {
             foreach ($data['message'] as $mess) {
-                if (!$isBackgroundNotification && empty($mess)) {
+                if ($isBackgroundNotification == false && empty($mess)) {
                     return $result;
                 }
             }
@@ -104,7 +104,7 @@ class OnesignalHandler
 
         $type = $this->getCorrectSendToType($type);
 
-        if (($isBackgroundNotification || count($messages) > 0) && $type !== null) {
+        if (($isBackgroundNotification == true || count($messages) > 0) && $type !== null) {
 
             $params = $this->getParameters();
 
@@ -112,7 +112,7 @@ class OnesignalHandler
             $fields = array(
                 'app_id' => $params['app_id'],
             );
-            if(!$isBackgroundNotification) {
+            if($isBackgroundNotification == false) {
                 $fields['contents'] = $messages;    //Se la notifica è Background (Android) non setto il content
             }
 
@@ -150,7 +150,10 @@ class OnesignalHandler
             }
 
             //Background - Android
-            $fields['android_background_data'] = $isBackgroundNotification;
+            if($isBackgroundNotification !== null) {
+                $fields['android_background_data'] = $isBackgroundNotification;
+            }
+
 
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");

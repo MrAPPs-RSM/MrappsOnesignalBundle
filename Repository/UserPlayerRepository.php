@@ -38,15 +38,16 @@ class UserPlayerRepository extends \Doctrine\ORM\EntityRepository
         return $output;
     }
 
-    public function unsetUserPlayers(UserInterface $user = null)
+    public function unsetUserPlayers(UserInterface $user = null, $ignorePlayers = array())
     {
-
         if ($user !== null) {
 
             $em = $this->getEntityManager();
 
             $players = array();
             $idsPlayers = array();
+
+            if(!is_array($ignorePlayers)) $ignorePlayers = array($ignorePlayers);
 
             //Elimina relazioni
             $ups = $em->getRepository('MrappsOnesignalBundle:UserPlayer')->findBy(array('user' => $user));
@@ -63,7 +64,8 @@ class UserPlayerRepository extends \Doctrine\ORM\EntityRepository
 
             //Elimina i Player inattivi
             foreach ($players as $p) {
-                if (Utils::deactivatePlayer($p->getPlayerId())) {
+
+                if (!in_array($p->getPlayerId(), $ignorePlayers) && Utils::deactivatePlayer($p->getPlayerId())) {
                     $em->getRepository('MrappsOnesignalBundle:Player')->deleteInactivePlayer($p, false);
                 }
             }

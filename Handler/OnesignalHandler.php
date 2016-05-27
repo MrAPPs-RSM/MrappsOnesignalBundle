@@ -266,11 +266,10 @@ class OnesignalHandler
         return $success;
     }
 
-    public function deactivateAllPlayersForUser(UserInterface $user = null)
+    public function deactivateAllPlayersForUser(UserInterface $user = null, $ignorePlayers = array())
     {
-
         if ($user !== null) {
-            return $this->em->getRepository('MrappsOnesignalBundle:UserPlayer')->unsetUserPlayers($user);
+            return $this->em->getRepository('MrappsOnesignalBundle:UserPlayer')->unsetUserPlayers($user, $ignorePlayers);
         }
 
         return false;

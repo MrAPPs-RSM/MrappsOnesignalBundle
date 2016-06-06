@@ -5,7 +5,7 @@ namespace Mrapps\OnesignalBundle\Handler;
 use Symfony\Component\DependencyInjection\Container;
 use Doctrine\ORM\EntityManager;
 use Mrapps\OnesignalBundle\Model\UserInterface;
-use Mrapps\OnesignalBundle\Utils;
+use Mrapps\OnesignalBundle\Classes\Utils;
 
 
 class OnesignalHandler

@@ -5,7 +5,7 @@ namespace Mrapps\OnesignalBundle\Classes;
 
 class OneSignalConsts
 {
-    const IOS = "iOS";
-    const ANDROID = "Android";
-    const WEB = "Web";
+    const PLATFORM_TYPE_IOS = "IOS";
+    const PLATFORM_TYPE_ANDROID = "ANDROID";
+    const PLATFORM_TYPE_WEB = "WEB";
 }

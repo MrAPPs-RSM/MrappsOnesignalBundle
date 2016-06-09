@@ -50,14 +50,12 @@ class OnesignalHandler
     private function isValidPlatformOS($filterByOS)
     {
         switch ($filterByOS) {
-            case OneSignalConsts::IOS:
-            case OneSignalConsts::ANDROID:
-            case OneSignalConsts::WEB:
+            case OneSignalConsts::PLATFORM_TYPE_IOS:
+            case OneSignalConsts::PLATFORM_TYPE_ANDROID:
+            case OneSignalConsts::PLATFORM_TYPE_WEB:
                 return true;
-                break;
             default:
                 return false;
-                break;
         }
     }
 
@@ -73,14 +71,21 @@ class OnesignalHandler
     public function filterPlayersByOS(array $players, $filterByOS)
     {
         if ($this->isValidPlatformOS($filterByOS)) {
+
+            $params = array(
+                '1' => $players,
+                'platformType' => $filterByOS,
+            );
+            $tmp = $this->em->createQuery("
+                SELECT p
+                FROM MrappsOnesignalBundle:Player p
+                WHERE p.playerId IN (?1)
+                AND p.platformType = :platformType
+            ")->setParameters($params)->execute();
+
             $filteredPlayers = array();
-
-            foreach ($players as $playerId) {
-                $player = $this->em->getRepository("MrappsOnesignalBundle:Player")->find($playerId);
-
-                if ($player->getPlatform() == $filterByOS) {
-                    $filteredPlayers[] = $playerId;
-                }
+            foreach($tmp as $p) {
+                $filteredPlayers[] = $p->getPlayerId();
             }
 
             return $filteredPlayers;
@@ -165,7 +170,11 @@ class OnesignalHandler
                     if (!is_array($sendTo)) $sendTo = array('All');
                     $fields['included_segments'] = $sendTo;
 
-                    //todo: gestire $filterByOS
+                    /*
+                     * @TODO
+                     * Gestire $filterByOS utilizzando la funzione nativa di OS con i segmenti
+                     */
+
                     break;
                 case 'players':
                     if (!is_array($sendTo)) $sendTo = array();

@@ -2,6 +2,7 @@
 
 namespace Mrapps\OnesignalBundle\Handler;
 
+use Mrapps\OnesignalBundle\Classes\OneSignalConsts;
 use Symfony\Component\DependencyInjection\Container;
 use Doctrine\ORM\EntityManager;
 use Mrapps\OnesignalBundle\Model\UserInterface;
@@ -47,6 +48,41 @@ class OnesignalHandler
     }
 
     /**
+     * Filtra l'array di players_id in base all'OS specificato.
+     *
+     * @param array $players array di player_id
+     * @param string $filterByOS const in OneSignalConsts
+     *
+     * @return array Ritorna la lista fitrata dei player_id
+     *
+     */
+    public function filterPlayersByOS(array $players, $filterByOS)
+    {
+        switch ($filterByOS) {
+            case OneSignalConsts::IOS:
+            case OneSignalConsts::ANDROID:
+            case OneSignalConsts::WEB:
+
+                $filteredPlayers = array();
+
+                foreach ($players as $playerId) {
+                    $player = $this->em->getRepository("MrappsOnesignalBundle:Player")->find($playerId);
+
+                    if ($player->getPlatform() == $filterByOS) {
+                        $filteredPlayers[] = $playerId;
+                    }
+                }
+
+                return $filteredPlayers;
+
+                break;
+            default:
+                return $players;
+                break;
+        }
+    }
+
+    /**
      * Invia una notifica.
      *
      * @param array $data array che contiene array/string message, array/string title,url,array parameters per specificare altri parametri
@@ -56,7 +92,7 @@ class OnesignalHandler
      * @return array Ritorna se la chiamata è stata eseguita correttamente ed eventuali errori specificati nella chiamata
      *
      */
-    public function sendNotification($data = array(), $type = null, $sendTo = array())
+    public function sendNotification($data = array(), $type = null, $sendTo = array(), $filterByOS = null)
     {
         $result = array("success" => false, "message" => "Parametri non corretti", "error_code" => 1001);//parametri passati non corretti
 
@@ -112,7 +148,7 @@ class OnesignalHandler
             $fields = array(
                 'app_id' => $params['app_id'],
             );
-            if($isBackgroundNotification == false) {
+            if ($isBackgroundNotification == false) {
                 $fields['contents'] = $messages;    //Se la notifica è Background (Android) non setto il content
             }
 
@@ -120,10 +156,14 @@ class OnesignalHandler
                 case 'segments':
                     if (!is_array($sendTo)) $sendTo = array('All');
                     $fields['included_segments'] = $sendTo;
+
+                    //todo: gestire $filterByOS
                     break;
                 case 'players':
                     if (!is_array($sendTo)) $sendTo = array();
                     $fields['include_player_ids'] = $sendTo;
+
+                    //todo: gestire $filterByOS
                     break;
             }
 
@@ -150,7 +190,7 @@ class OnesignalHandler
             }
 
             //Background - Android
-            if($isBackgroundNotification !== null) {
+            if ($isBackgroundNotification !== null) {
                 $fields['android_background_data'] = $isBackgroundNotification;
             }
 
@@ -189,7 +229,7 @@ class OnesignalHandler
                                 $this->em->getRepository("MrappsOnesignalBundle:Player")->deletePlayer($playerId, false);
                             }
                             $this->em->flush();
-                        }else{
+                        } else {
                             foreach ($responseArr["errors"] as $error) {
                                 $result["message"] = $error;
                                 $result["error_code"] = 1003;//All included players are not subscribed

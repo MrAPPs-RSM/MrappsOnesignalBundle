@@ -100,12 +100,11 @@ class OnesignalHandler
      * @param array $data array che contiene array/string message, array/string title,url,array parameters per specificare altri parametri
      * @param string $type segments/players
      * @param array $sendTo array di players o segmenti verso cui inviare la notifica
-     * @param string $filterByOS se specificata, i players sono filtrati in base alla piattaforma
      *
      * @return array Ritorna se la chiamata è stata eseguita correttamente ed eventuali errori specificati nella chiamata
      *
      */
-    public function sendNotification($data = array(), $type = null, $sendTo = array(), $filterByOS = null)
+    public function sendNotification($data = array(), $type = null, $sendTo = array())
     {
         $result = array("success" => false, "message" => "Parametri non corretti", "error_code" => 1001);//parametri passati non corretti
 
@@ -114,6 +113,9 @@ class OnesignalHandler
 
         //Notifica in background?
         $isBackgroundNotification = (isset($data['background'])) ? (bool)$data['background'] : null;
+
+        //Filter by OS
+        $filterByOS = (isset($data['filter_by_os'])) ? $data['filter_by_os'] : null;
 
         if ($isBackgroundNotification == false && (!isset($data['message']) || empty($data['message']))) {
             return $result;

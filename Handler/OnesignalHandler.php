@@ -2,6 +2,7 @@
 
 namespace Mrapps\OnesignalBundle\Handler;
 
+use Mrapps\OnesignalBundle\Classes\OneSignalConsts;
 use Symfony\Component\DependencyInjection\Container;
 use Doctrine\ORM\EntityManager;
 use Mrapps\OnesignalBundle\Model\UserInterface;
@@ -46,17 +47,65 @@ class OnesignalHandler
         return $type;
     }
 
+    private function isValidPlatformOS($filterByOS)
+    {
+        switch ($filterByOS) {
+            case OneSignalConsts::PLATFORM_TYPE_IOS:
+            case OneSignalConsts::PLATFORM_TYPE_ANDROID:
+            case OneSignalConsts::PLATFORM_TYPE_WEB:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Filtra l'array di players_id in base all'OS specificato.
+     *
+     * @param array $players array di player_id
+     * @param string $filterByOS const in OneSignalConsts
+     *
+     * @return array Ritorna la lista fitrata dei player_id
+     *
+     */
+    public function filterPlayersByOS(array $players, $filterByOS)
+    {
+        if ($this->isValidPlatformOS($filterByOS)) {
+
+            $params = array(
+                '1' => $players,
+                'platformType' => $filterByOS,
+            );
+            $tmp = $this->em->createQuery("
+                SELECT p
+                FROM MrappsOnesignalBundle:Player p
+                WHERE p.playerId IN (?1)
+                AND p.platformType = :platformType
+            ")->setParameters($params)->execute();
+
+            $filteredPlayers = array();
+            foreach($tmp as $p) {
+                $filteredPlayers[] = $p->getPlayerId();
+            }
+
+            return $filteredPlayers;
+        } else {
+            return $players;
+        }
+    }
+
     /**
      * Invia una notifica.
      *
      * @param array $data array che contiene array/string message, array/string title,url,array parameters per specificare altri parametri
      * @param string $type segments/players
      * @param array $sendTo array di players o segmenti verso cui inviare la notifica
+     * @param string $filterByOS se specificata, i players sono filtrati in base alla piattaforma
      *
      * @return array Ritorna se la chiamata è stata eseguita correttamente ed eventuali errori specificati nella chiamata
      *
      */
-    public function sendNotification($data = array(), $type = null, $sendTo = array())
+    public function sendNotification($data = array(), $type = null, $sendTo = array(), $filterByOS = null)
     {
         $result = array("success" => false, "message" => "Parametri non corretti", "error_code" => 1001);//parametri passati non corretti
 
@@ -112,7 +161,7 @@ class OnesignalHandler
             $fields = array(
                 'app_id' => $params['app_id'],
             );
-            if($isBackgroundNotification == false) {
+            if ($isBackgroundNotification == false) {
                 $fields['contents'] = $messages;    //Se la notifica è Background (Android) non setto il content
             }
 
@@ -120,10 +169,18 @@ class OnesignalHandler
                 case 'segments':
                     if (!is_array($sendTo)) $sendTo = array('All');
                     $fields['included_segments'] = $sendTo;
+
+                    /*
+                     * @TODO
+                     * Gestire $filterByOS utilizzando la funzione nativa di OS con i segmenti
+                     */
+
                     break;
                 case 'players':
                     if (!is_array($sendTo)) $sendTo = array();
-                    $fields['include_player_ids'] = $sendTo;
+
+                    $playersId = $this->filterPlayersByOS($sendTo, $filterByOS);
+                    $fields['include_player_ids'] = $playersId;
                     break;
             }
 
@@ -150,7 +207,7 @@ class OnesignalHandler
             }
 
             //Background - Android
-            if($isBackgroundNotification !== null) {
+            if ($isBackgroundNotification !== null) {
                 $fields['android_background_data'] = $isBackgroundNotification;
             }
 
@@ -189,7 +246,7 @@ class OnesignalHandler
                                 $this->em->getRepository("MrappsOnesignalBundle:Player")->deletePlayer($playerId, false);
                             }
                             $this->em->flush();
-                        }else{
+                        } else {
                             foreach ($responseArr["errors"] as $error) {
                                 $result["message"] = $error;
                                 $result["error_code"] = 1003;//All included players are not subscribed

@@ -191,28 +191,4 @@ class Player extends Base
     {
         return $this->registrationId;
     }
-
-    /**
-     * Set platformType
-     *
-     * @param string $platformType
-     *
-     * @return Player
-     */
-    public function setPlatformType($platformType)
-    {
-        $this->platformType = $platformType;
-
-        return $this;
-    }
-
-    /**
-     * Get platformType
-     *
-     * @return string
-     */
-    public function getPlatformType()
-    {
-        return $this->platformType;
-    }
 }

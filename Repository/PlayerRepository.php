@@ -30,6 +30,7 @@ class PlayerRepository extends \Doctrine\ORM\EntityRepository
             $deviceName = (isset($extraData['device_name'])) ? trim($extraData['device_name']) : null;
             $deviceVersion = (isset($extraData['device_version'])) ? trim($extraData['device_version']) : null;
             $platform = (isset($extraData['platform'])) ? trim($extraData['platform']) : null;
+            $platformType = (isset($extraData['platform_type'])) ? strtoupper(trim($extraData['platform_type'])) : null;
             $registrationID = (isset($extraData['registration_id'])) ? trim($extraData['registration_id']) : null;
 
             //Il Player esiste già?
@@ -46,6 +47,7 @@ class PlayerRepository extends \Doctrine\ORM\EntityRepository
             $player->setDeviceVersion($deviceVersion);
             $player->setPlatform($platform);
             $player->setRegistrationId($registrationID);
+            $player->setPlatformType($platformType);
 
             $em->persist($player);
             $em->flush($player);

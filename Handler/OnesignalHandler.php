@@ -47,6 +47,20 @@ class OnesignalHandler
         return $type;
     }
 
+    private function isValidPlatformOS($filterByOS)
+    {
+        switch ($filterByOS) {
+            case OneSignalConsts::IOS:
+            case OneSignalConsts::ANDROID:
+            case OneSignalConsts::WEB:
+                return true;
+                break;
+            default:
+                return false;
+                break;
+        }
+    }
+
     /**
      * Filtra l'array di players_id in base all'OS specificato.
      *
@@ -58,27 +72,20 @@ class OnesignalHandler
      */
     public function filterPlayersByOS(array $players, $filterByOS)
     {
-        switch ($filterByOS) {
-            case OneSignalConsts::IOS:
-            case OneSignalConsts::ANDROID:
-            case OneSignalConsts::WEB:
+        if ($this->isValidPlatformOS($filterByOS)) {
+            $filteredPlayers = array();
 
-                $filteredPlayers = array();
+            foreach ($players as $playerId) {
+                $player = $this->em->getRepository("MrappsOnesignalBundle:Player")->find($playerId);
 
-                foreach ($players as $playerId) {
-                    $player = $this->em->getRepository("MrappsOnesignalBundle:Player")->find($playerId);
-
-                    if ($player->getPlatform() == $filterByOS) {
-                        $filteredPlayers[] = $playerId;
-                    }
+                if ($player->getPlatform() == $filterByOS) {
+                    $filteredPlayers[] = $playerId;
                 }
+            }
 
-                return $filteredPlayers;
-
-                break;
-            default:
-                return $players;
-                break;
+            return $filteredPlayers;
+        } else {
+            return $players;
         }
     }
 
@@ -88,6 +95,7 @@ class OnesignalHandler
      * @param array $data array che contiene array/string message, array/string title,url,array parameters per specificare altri parametri
      * @param string $type segments/players
      * @param array $sendTo array di players o segmenti verso cui inviare la notifica
+     * @param string $filterByOS se specificata, i players sono filtrati in base alla piattaforma
      *
      * @return array Ritorna se la chiamata è stata eseguita correttamente ed eventuali errori specificati nella chiamata
      *
@@ -161,9 +169,9 @@ class OnesignalHandler
                     break;
                 case 'players':
                     if (!is_array($sendTo)) $sendTo = array();
-                    $fields['include_player_ids'] = $sendTo;
 
-                    //todo: gestire $filterByOS
+                    $playersId = $this->filterPlayersByOS($sendTo, $filterByOS);
+                    $fields['include_player_ids'] = $playersId;
                     break;
             }
 
